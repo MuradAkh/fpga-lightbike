@@ -1,0 +1,3 @@
+Warning (10268): Verilog HDL information at keyboard.v(32): always construct contains both blocking and non-blocking assignments File: /media/edtoaster/LABS/csc258/fpga-lightbike/drivers/keyboard.v Line: 32
+Warning (10268): Verilog HDL information at main.v(222): always construct contains both blocking and non-blocking assignments File: /media/edtoaster/LABS/csc258/fpga-lightbike/main.v Line: 222
+Warning (10268): Verilog HDL information at main.v(328): always construct contains both blocking and non-blocking assignments File: /media/edtoaster/LABS/csc258/fpga-lightbike/main.v Line: 328
