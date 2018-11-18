@@ -1,0 +1,6 @@
+
+State Machine - |main|game_ctrl:control|g_curr
+Name g_curr.G_DISP g_curr.G_IDLE g_curr.G_GAME 
+g_curr.G_IDLE 0 0 0 
+g_curr.G_GAME 0 1 1 
+g_curr.G_DISP 1 1 0 

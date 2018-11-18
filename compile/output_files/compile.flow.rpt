@@ -1,5 +1,5 @@
 Flow report for compile
-Sat Nov 17 20:56:15 2018
+Sun Nov 18 00:59:09 2018
 Quartus Prime Version 18.0.0 Build 614 04/24/2018 SJ Lite Edition
 
 
@@ -37,24 +37,29 @@ refer to the applicable agreement for further details.
 
 
 
-+---------------------------------------------------------------------------+
-; Flow Summary                                                              ;
-+-----------------------------+---------------------------------------------+
-; Flow Status                 ; Flow Failed - Sat Nov 17 20:56:15 2018      ;
-; Quartus Prime Version       ; 18.0.0 Build 614 04/24/2018 SJ Lite Edition ;
-; Revision Name               ; compile                                     ;
-; Top-level Entity Name       ; main                                        ;
-; Family                      ; Cyclone V                                   ;
-; Device                      ; 5CSEMA5F31C6                                ;
-; Timing Models               ; Final                                       ;
-; Logic utilization (in ALMs) ; N/A until Partition Merge                   ;
-; Total registers             ; N/A until Partition Merge                   ;
-; Total pins                  ; N/A until Partition Merge                   ;
-; Total virtual pins          ; N/A until Partition Merge                   ;
-; Total block memory bits     ; N/A until Partition Merge                   ;
-; Total PLLs                  ; N/A until Partition Merge                   ;
-; Total DLLs                  ; N/A until Partition Merge                   ;
-+-----------------------------+---------------------------------------------+
++-------------------------------------------------------------------------------+
+; Flow Summary                                                                  ;
++---------------------------------+---------------------------------------------+
+; Flow Status                     ; Successful - Sun Nov 18 00:59:09 2018       ;
+; Quartus Prime Version           ; 18.0.0 Build 614 04/24/2018 SJ Lite Edition ;
+; Revision Name                   ; compile                                     ;
+; Top-level Entity Name           ; main                                        ;
+; Family                          ; Cyclone V                                   ;
+; Device                          ; 5CSEMA5F31C6                                ;
+; Timing Models                   ; Final                                       ;
+; Logic utilization (in ALMs)     ; 1,482 / 32,070 ( 5 % )                      ;
+; Total registers                 ; 1222                                        ;
+; Total pins                      ; 62 / 457 ( 14 % )                           ;
+; Total virtual pins              ; 0                                           ;
+; Total block memory bits         ; 115,200 / 4,065,280 ( 3 % )                 ;
+; Total DSP Blocks                ; 0 / 87 ( 0 % )                              ;
+; Total HSSI RX PCSs              ; 0                                           ;
+; Total HSSI PMA RX Deserializers ; 0                                           ;
+; Total HSSI TX PCSs              ; 0                                           ;
+; Total HSSI PMA TX Serializers   ; 0                                           ;
+; Total PLLs                      ; 1 / 6 ( 17 % )                              ;
+; Total DLLs                      ; 0 / 4 ( 0 % )                               ;
++---------------------------------+---------------------------------------------+
 
 
 +-----------------------------------------+
@@ -62,7 +67,7 @@ refer to the applicable agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 11/17/2018 20:55:39 ;
+; Start date & time ; 11/18/2018 00:57:07 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; compile             ;
 +-------------------+---------------------+
@@ -73,7 +78,7 @@ refer to the applicable agreement for further details.
 +-------------------------------------+----------------------------------------+---------------+-------------+----------------+
 ; Assignment Name                     ; Value                                  ; Default Value ; Entity Name ; Section Id     ;
 +-------------------------------------+----------------------------------------+---------------+-------------+----------------+
-; COMPILER_SIGNATURE_ID               ; 172308999868265.154250613925231        ; --            ; --          ; --             ;
+; COMPILER_SIGNATURE_ID               ; 172308999868265.154252062722340        ; --            ; --          ; --             ;
 ; EDA_OUTPUT_DATA_FORMAT              ; Verilog Hdl                            ; --            ; --          ; eda_simulation ;
 ; EDA_SIMULATION_TOOL                 ; ModelSim-Altera (Verilog)              ; <None>        ; --          ; --             ;
 ; EDA_TIME_SCALE                      ; 1 ps                                   ; --            ; --          ; eda_simulation ;
@@ -92,8 +97,12 @@ refer to the applicable agreement for further details.
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis ; 00:00:36     ; 1.0                     ; 983 MB              ; 00:00:47                           ;
-; Total                ; 00:00:36     ; --                      ; --                  ; 00:00:47                           ;
+; Analysis & Synthesis ; 00:00:30     ; 1.0                     ; 1262 MB             ; 00:00:41                           ;
+; Fitter               ; 00:01:03     ; 1.2                     ; 2693 MB             ; 00:02:27                           ;
+; Assembler            ; 00:00:06     ; 1.0                     ; 978 MB              ; 00:00:05                           ;
+; Timing Analyzer      ; 00:00:11     ; 1.7                     ; 1309 MB             ; 00:00:15                           ;
+; EDA Netlist Writer   ; 00:00:02     ; 1.0                     ; 1269 MB             ; 00:00:02                           ;
+; Total                ; 00:01:52     ; --                      ; --                  ; 00:03:30                           ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
@@ -103,6 +112,10 @@ refer to the applicable agreement for further details.
 ; Module Name          ; Machine Hostname ; OS Name      ; OS Version ; Processor type ;
 +----------------------+------------------+--------------+------------+----------------+
 ; Analysis & Synthesis ; toast            ; Ubuntu 18.10 ; 18         ; x86_64         ;
+; Fitter               ; toast            ; Ubuntu 18.10 ; 18         ; x86_64         ;
+; Assembler            ; toast            ; Ubuntu 18.10 ; 18         ; x86_64         ;
+; Timing Analyzer      ; toast            ; Ubuntu 18.10 ; 18         ; x86_64         ;
+; EDA Netlist Writer   ; toast            ; Ubuntu 18.10 ; 18         ; x86_64         ;
 +----------------------+------------------+--------------+------------+----------------+
 
 
@@ -110,6 +123,10 @@ refer to the applicable agreement for further details.
 ; Flow Log ;
 ------------
 quartus_map --read_settings_files=on --write_settings_files=off compile -c compile
+quartus_fit --read_settings_files=off --write_settings_files=off compile -c compile
+quartus_asm --read_settings_files=off --write_settings_files=off compile -c compile
+quartus_sta compile -c compile
+quartus_eda --read_settings_files=off --write_settings_files=off compile -c compile
 
 
 

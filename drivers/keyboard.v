@@ -1,6 +1,5 @@
 module controller(
     input c50,
-    input control,
     input pc,
     input pd,
     input reset_all,
@@ -29,11 +28,11 @@ module controller(
 
     reg prev_pcf;
 
-    always @(posedge c50, posedge control)
+    always @(negedge c50)
     begin
         
         // ** RESET LOGIC ** //
-        if(!reset_all && control) 
+        if(!reset_all) 
         begin
             make_lut <= 512'd0;
             persist_lut <= 512'd0;

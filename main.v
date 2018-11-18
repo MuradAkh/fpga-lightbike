@@ -3,15 +3,16 @@ module main (
     	// Your inputs and outputs here
     input [3:0] KEY,
     input [9:0] SW,
+    output [9:0] LEDR,
 
     output VGA_CLK,   						//	VGA Clock
     output VGA_HS,							//	VGA H_SYNC
     output VGA_VS,							//	VGA V_SYNC
     output VGA_BLANK_N,						//	VGA BLANK
     output VGA_SYNC_N,						//	VGA SYNC
-    output VGA_R,   						//	VGA Red[9:0]
-    output VGA_G,	 						//	VGA Green[9:0]
-    output VGA_B,   						//	VGA Blue[9:0]
+    output [9:0] VGA_R,   						//	VGA Red[9:0]
+    output [9:0] VGA_G,	 						//	VGA Green[9:0]
+    output [9:0] VGA_B,   						//	VGA Blue[9:0]
 
     input PS2_CLK,
     input PS2_DAT
@@ -29,15 +30,14 @@ module main (
     wire [24:0] out;
     wire [511:0] make_lut, persist_lut, break_lut;
 
-    keyboard controller(
+    controller keyboard(
         CLOCK_50,
-        game_clk,
         PS2_CLK,
         PS2_DAT,
-        1'b0,
+        KEY[0],
+        ~game_clk,
         1'b1,
-        1'b0,
-        1'b1,
+        ~game_clk,
         out,
         make_lut,
         persist_lut,
@@ -47,7 +47,7 @@ module main (
 
     wire round_finished, disp_continue, reset_game, run_game;
     wire enter_pressed;
-    assign enter_pressed = make_lut[9'h5A];
+    assign enter_pressed = make_lut[9'h05A];
 
 
     game_ctrl control(
@@ -60,7 +60,9 @@ module main (
 
         enter_pressed,
         reset_game,
-        run_game
+        run_game,
+
+        LEDR[1:0]
     );
 
     game_data data(
@@ -79,8 +81,8 @@ module main (
         plot,
 
         round_finished,
-        disp_continue
-
+        disp_continue,
+        LEDR[9:2]
     );
 
     // Create the colour, x, y and writeEn wires that are inputs to the controller.
@@ -129,18 +131,20 @@ module game_ctrl (
     input enter_pressed,
 
     // outputs to datapath
-    output reset_game,
-    output run_game
+    output reg reset_game,
+    output reg run_game,
+
+    output [1:0] LEDR
 );
 
     localparam 
-        G_IDLE = 2'd0,  // wait for player to start
-        G_GAME = 2'd1,  // game state
-        G_DISP = 2'd2;  // pause to give players time to reset
+        G_IDLE = 2'd1,  // wait for player to start
+        G_GAME = 2'd2,  // game state
+        G_DISP = 2'd3;  // pause to give players time to reset
 
     reg [1:0] g_curr, g_next;
-    assign reset_game = g_curr == G_IDLE;
-    assign run_game = g_curr == G_GAME;
+
+    assign LEDR[1:0] = g_curr;
 
     always @(posedge game_clk)
     begin: game_fsm
@@ -156,6 +160,18 @@ module game_ctrl (
             G_GAME: g_next <= round_finished ? G_DISP : G_GAME;
             G_DISP: g_next <= disp_continue ? G_IDLE : G_DISP;
         endcase 
+    end
+
+    always @(*)
+    begin: control_sig
+        reset_game = 1'b0;
+        run_game = 1'b0;
+
+        case(g_curr)
+            G_IDLE: reset_game = 1'b1;
+            G_GAME: run_game = 1'b1;
+            default:;
+        endcase
     end
 
 endmodule
@@ -178,10 +194,12 @@ module game_data(
     output reg [5:0] colour,    
     output reg [7:0] x,
     output reg [6:0] y,
-    output reg plot,
+    output plot,
 
     output round_finished,
-    output disp_continue
+    output disp_continue,
+
+    output [7:0] LEDR
 );
     wire [1:0] turning_dir [2:0];
     assign {turning_dir[2], turning_dir[1], turning_dir[0]} = turn;
@@ -198,16 +216,18 @@ module game_data(
         P2_C = 6'b111011,
         PE_C = 6'b010101,
 
-        WIDTH = 160,
-        HEIGHT = 120;
+        WIDTH = 8'd160,
+        HEIGHT = 7'd120;
 
     reg [2:0] p_state;
-    assign round_finished = ^p_state && ~&p_state || ~|p_state; // round is finished when one player standing
+    // assign round_finished = ^p_state && ~&p_state && ~|p_state; // round is finished when one player standing
+    assign round_finished = 1'b0;
 
     // reg [2:0] p_in_air;
     reg [7:0] p_pos_x [2:0];
     reg [6:0] p_pos_y [2:0];
 
+    assign LEDR = p_pos_x[0];
     // 00 is up, 01 is right, 10 is down, 11 is left
     reg [1:0] p_dir [2:0];
 
@@ -223,12 +243,13 @@ module game_data(
     begin: game_logic
         if(reset_game) begin
             integer i, j;
-            for(i = 0; i < 120; i = i + 1) begin
+            for(i = 0; i < WIDTH; i = i + 1) begin
                 for(j = 0; j < HEIGHT; j = j + 1) begin
                     g_state[i][j] <= PE;
                 end
             end
-            disp_counter <= 5'b0;
+            disp_counter <= 5'b11111;
+
             p_state <= 3'b111;
             
             p_pos_x[2] <= 8'd85;
@@ -251,41 +272,46 @@ module game_data(
             // player movement
             integer player;
             integer i;
-            integer j;
 
+            // for(player = 0; player < 3; player = player + 1) begin
+
+            //     // check if player is still alive
+            //     if(p_state[player] == 1'b1) begin
+            //         // turn player
+            //         case(turning_dir[player])
+            //             2'b01: p_dir[player] = p_dir[player] + 1;
+            //             2'b10: p_dir[player] = p_dir[player] - 1;
+            //             default:;
+            //         endcase
+
+            //         // movement
+            //         case(p_dir[player])
+            //             2'b00: begin // up
+            //                 if(p_pos_y[player] <= 0) p_state[player] = 1'b0;
+            //                 else p_pos_y[player] = p_pos_y[player] - 1'b1;
+            //             end
+            //             2'b10: begin // down
+            //                 if(p_pos_y[player] >= HEIGHT - 1) p_state[player] = 1'b0;
+            //                 else p_pos_y[player] = p_pos_y[player] + 1'b1;
+            //             end
+            //             2'b11: begin // left
+            //                 if(p_pos_x[player] <= 0) p_state[player] = 1'b0;
+            //                 else p_pos_x[player] = p_pos_x[player] - 1'b1;
+            //             end
+            //             2'b01: begin // right
+            //                 if(p_pos_x[player] >= WIDTH - 1) p_state[player] = 1'b0;
+            //                 else p_pos_x[player] = p_pos_x[player] + 1'b1;
+            //             end
+            //         endcase
+
+            //         // kill player if this block is not empty
+            //         if(g_state[player][p_pos_x[player]][p_pos_y[player]] != PE) p_state[player] = 1'b0;
+            //     end
+            // end
             for(player = 0; player < 3; player = player + 1) begin
-
-                // check if player is still alive
                 if(p_state[player] == 1'b1) begin
-                    // turn player
-                    case(turning_dir[player])
-                        2'b01: p_dir[player] = p_dir[player] + 1;
-                        2'b10: p_dir[player] = p_dir[player] - 1;
-                        default:;
-                    endcase
-
-                    // movement
-                    case(p_dir[player])
-                        2'b00: begin // up
-                            if(p_pos_y[player] <= 0) p_state[player] = 1'b0;
-                            else p_pos_y[player] = p_pos_y[player] - 1'b1;
-                        end
-                        2'b10: begin // down
-                            if(p_pos_y[player] >= HEIGHT - 1) p_state[player] = 1'b0;
-                            else p_pos_y[player] = p_pos_y[player] + 1'b1;
-                        end
-                        2'b11: begin // left
-                            if(p_pos_x[player] <= 0) p_state[player] = 1'b0;
-                            else p_pos_x[player] = p_pos_x[player] - 1'b1;
-                        end
-                        2'b01: begin // right
-                            if(p_pos_x[player] >= WIDTH - 1) p_state[player] = 1'b0;
-                            else p_pos_x[player] = p_pos_x[player] + 1'b1;
-                        end
-                    endcase
-
-                    // kill player if this block is not empty
-                    if(g_state[player][p_pos_x[player]][p_pos_y[player]] != PE) p_state[player] = 1'b0;
+                    p_pos_x[player] <= p_pos_x[player] + 1'b1;
+                    p_pos_y[player] <= p_pos_y[player] + 1'b1;
                 end
             end
 
@@ -296,17 +322,15 @@ module game_data(
                 end
             end
 
-            // clear board
-            for(i = 0; i < WIDTH; i = i + 1) begin
-                for(j = 0; j < HEIGHT; j = j + 1) begin
-                    case(g_state[i][j])
-                        P0: g_state[i][j] = p_state[0] ? P0 : PE;
-                        P1: g_state[i][j] = p_state[1] ? P1 : PE;
-                        P2: g_state[i][j] = p_state[2] ? P2 : PE;
-                        default: g_state[i][j] = PE;
-                    endcase
-                end
-            end
+            // // clear board
+            // for(i = 0; i < WIDTH * HEIGHT; i = i + 1) begin
+            //     case(g_state[i % WIDTH][i / WIDTH])
+            //         P0: g_state[i % WIDTH][i / WIDTH] <= p_state[0] ? P0 : PE;
+            //         P1: g_state[i % WIDTH][i / WIDTH] <= p_state[1] ? P1 : PE;
+            //         P2: g_state[i % WIDTH][i / WIDTH] <= p_state[2] ? P2 : PE;
+            //         default: g_state[i % WIDTH][i / WIDTH] <= PE;
+            //     endcase
+            // end
         end
         else begin
             // display state
@@ -319,10 +343,12 @@ module game_data(
     always @(posedge CLOCK_50)
     begin: draw_logic
         if(!reset_n)
-            draw_counter <= WIDTH * HEIGHT - 1;
+            draw_counter <= WIDTH * HEIGHT - 1'b1;
         else
-            draw_counter <= draw_counter == 0 ? WIDTH * HEIGHT - 1 : draw_counter - 1; 
+            draw_counter <= draw_counter == 15'd0 ? WIDTH * HEIGHT - 1 : draw_counter - 1; 
     end
+
+    assign plot = 1'b1;
 
     always @(*)
     begin: plot_logic
@@ -330,7 +356,6 @@ module game_data(
         x = draw_counter % WIDTH;
         y = draw_counter / WIDTH;
         
-        plot <= 1'b1;
         case(g_state[x][y])
             P0: colour <= P0_C;
             P1: colour <= P1_C;
