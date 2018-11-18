@@ -216,23 +216,23 @@ module game_data(
         P2_C = 6'b111011,
         PE_C = 6'b010101,
 
-        WIDTH = 8'd160,
-        HEIGHT = 7'd120;
+        WIDTH = 7'd80,
+        HEIGHT = 6'd60;
 
     reg [2:0] p_state;
     // assign round_finished = ^p_state && ~&p_state && ~|p_state; // round is finished when one player standing
     assign round_finished = 1'b0;
 
     // reg [2:0] p_in_air;
-    reg [7:0] p_pos_x [2:0];
-    reg [6:0] p_pos_y [2:0];
+    reg [6:0] p_pos_x [2:0];
+    reg [5:0] p_pos_y [2:0];
 
     assign LEDR = p_pos_x[0];
     // 00 is up, 01 is right, 10 is down, 11 is left
     reg [1:0] p_dir [2:0];
 
     //  per cell         x      y
-    reg [1:0] g_state [159:0][119:0];
+    reg [1:0] g_state [79:0][59:0];
 
 
     // counter to let the game wait 32 ticks until starting
@@ -252,13 +252,13 @@ module game_data(
 
             p_state <= 3'b111;
             
-            p_pos_x[2] <= 8'd85;
-            p_pos_x[1] <= 8'd75;
-            p_pos_x[0] <= 8'd80;
+            p_pos_x[2] <= 8'd45;
+            p_pos_x[1] <= 8'd35;
+            p_pos_x[0] <= 8'd40;
 
-            p_pos_y[2] <= 7'd65;
-            p_pos_y[1] <= 7'd65;
-            p_pos_y[0] <= 7'd55;
+            p_pos_y[2] <= 7'd35;
+            p_pos_y[1] <= 7'd35;
+            p_pos_y[0] <= 7'd25;
 
             p_dir[2] = 2'd0;
             p_dir[1] = 2'd3;
@@ -313,14 +313,11 @@ module game_data(
                     p_pos_x[player] <= p_pos_x[player] + 1'b1;
                     p_pos_y[player] <= p_pos_y[player] + 1'b1;
                 end
-            end
-
-            // set the block to be that player's
-            for(player = 0; player < 3; player = player + 1) begin
                 if (p_state[player] == 1'b1) begin
                     g_state[p_pos_x[player]][p_pos_y[player]] = player;
                 end
             end
+
 
             // // clear board
             // for(i = 0; i < WIDTH * HEIGHT; i = i + 1) begin
