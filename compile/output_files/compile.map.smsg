@@ -1,3 +1,5 @@
 Warning (10268): Verilog HDL information at keyboard.v(31): always construct contains both blocking and non-blocking assignments File: /media/edtoaster/LABS/csc258/fpga-lightbike/drivers/keyboard.v Line: 31
-Warning (10268): Verilog HDL information at main.v(242): always construct contains both blocking and non-blocking assignments File: /media/edtoaster/LABS/csc258/fpga-lightbike/main.v Line: 242
-Warning (10268): Verilog HDL information at main.v(351): always construct contains both blocking and non-blocking assignments File: /media/edtoaster/LABS/csc258/fpga-lightbike/main.v Line: 351
+Warning (10268): Verilog HDL information at main.v(301): always construct contains both blocking and non-blocking assignments File: /media/edtoaster/LABS/csc258/fpga-lightbike/main.v Line: 301
+Warning (10268): Verilog HDL information at main.v(355): always construct contains both blocking and non-blocking assignments File: /media/edtoaster/LABS/csc258/fpga-lightbike/main.v Line: 355
+Warning (10268): Verilog HDL information at main.v(375): always construct contains both blocking and non-blocking assignments File: /media/edtoaster/LABS/csc258/fpga-lightbike/main.v Line: 375
+Warning (10268): Verilog HDL information at main.v(528): always construct contains both blocking and non-blocking assignments File: /media/edtoaster/LABS/csc258/fpga-lightbike/main.v Line: 528
