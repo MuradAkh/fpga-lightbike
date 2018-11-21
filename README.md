@@ -48,6 +48,16 @@ After this week, the game will be done!
 
 ## Concept Art
 
+Green is about to become deceased:
+
+![Alive][c1]
+
+Green is cleared from the board:
+
+![Dead][c2]
+
 
 [logo]: ./assets/logo.png
+[c1]: ./assets/c1.png
+[c2]: ./assets/c2.png
 [tron]: https://en.wikipedia.org/wiki/Tron
