@@ -3,6 +3,8 @@
 
 Light bikes on FPGA is a locally-multiplayer game, inspired by the popular movie [Tron][tron]. It involves up to 3 players, each with their own uniquely-coloured bike on a game board. Much like the game Snake, any player who touches the boundaries or any trail left behind by the players will immediately die. Rounds are counted up in the end to determine the winner of the game, and the last person standing will win each round.
 
+The game is written in Verilog, a hardware description language, which can be synthesized into hardware logic and uploaded to an FPGA.
+
 ## Our Milestones
 ### Week 1.
 
