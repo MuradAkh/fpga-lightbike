@@ -1,3 +1,2 @@
-# Light Bikes
+# Light Bikes on FPGA
 
-A game

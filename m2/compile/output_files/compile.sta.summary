@@ -1,0 +1,357 @@
+------------------------------------------------------------
+Timing Analyzer Summary
+------------------------------------------------------------
+
+Type  : Slow 1100mV 85C Model Setup 'game_data:data|draw_state.D_FETCH'
+Slack : -20.649
+TNS   : -250.021
+
+Type  : Slow 1100mV 85C Model Setup 'game_data:data|draw_state.D_DRAW'
+Slack : -19.093
+TNS   : -276.879
+
+Type  : Slow 1100mV 85C Model Setup 'game_ctrl:control|g_curr.G_GAME'
+Slack : -8.397
+TNS   : -156.826
+
+Type  : Slow 1100mV 85C Model Setup 'counter[0]'
+Slack : -5.640
+TNS   : -66.209
+
+Type  : Slow 1100mV 85C Model Setup 'game_ctrl:control|g_curr.G_DISP'
+Slack : -5.601
+TNS   : -11.267
+
+Type  : Slow 1100mV 85C Model Setup 'CLOCK_50'
+Slack : -5.508
+TNS   : -2182.668
+
+Type  : Slow 1100mV 85C Model Setup 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 33.823
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Hold 'CLOCK_50'
+Slack : 0.211
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Hold 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 0.428
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Hold 'counter[0]'
+Slack : 0.518
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Hold 'game_ctrl:control|g_curr.G_GAME'
+Slack : 0.803
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Hold 'game_ctrl:control|g_curr.G_DISP'
+Slack : 0.839
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Hold 'game_data:data|draw_state.D_DRAW'
+Slack : 2.993
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Hold 'game_data:data|draw_state.D_FETCH'
+Slack : 3.716
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'counter[0]'
+Slack : -0.394
+TNS   : -8.031
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'game_ctrl:control|g_curr.G_GAME'
+Slack : 0.077
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'game_data:data|draw_state.D_DRAW'
+Slack : 0.105
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'game_data:data|draw_state.D_FETCH'
+Slack : 0.339
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'game_ctrl:control|g_curr.G_DISP'
+Slack : 0.386
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'VGA|mypll|altpll_component|auto_generated|generic_pll1~FRACTIONAL_PLL|vcoph[0]'
+Slack : 1.666
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'CLOCK_50'
+Slack : 8.860
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 18.768
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Setup 'game_data:data|draw_state.D_FETCH'
+Slack : -21.354
+TNS   : -259.389
+
+Type  : Slow 1100mV 0C Model Setup 'game_data:data|draw_state.D_DRAW'
+Slack : -19.840
+TNS   : -286.653
+
+Type  : Slow 1100mV 0C Model Setup 'game_ctrl:control|g_curr.G_GAME'
+Slack : -8.464
+TNS   : -159.538
+
+Type  : Slow 1100mV 0C Model Setup 'counter[0]'
+Slack : -5.725
+TNS   : -65.182
+
+Type  : Slow 1100mV 0C Model Setup 'game_ctrl:control|g_curr.G_DISP'
+Slack : -5.625
+TNS   : -11.122
+
+Type  : Slow 1100mV 0C Model Setup 'CLOCK_50'
+Slack : -4.907
+TNS   : -1947.597
+
+Type  : Slow 1100mV 0C Model Setup 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 33.948
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Hold 'CLOCK_50'
+Slack : 0.063
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Hold 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 0.403
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Hold 'counter[0]'
+Slack : 0.523
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Hold 'game_ctrl:control|g_curr.G_DISP'
+Slack : 0.732
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Hold 'game_ctrl:control|g_curr.G_GAME'
+Slack : 0.810
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Hold 'game_data:data|draw_state.D_DRAW'
+Slack : 3.106
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Hold 'game_data:data|draw_state.D_FETCH'
+Slack : 3.763
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'counter[0]'
+Slack : -0.394
+TNS   : -8.181
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'game_ctrl:control|g_curr.G_GAME'
+Slack : 0.063
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'game_data:data|draw_state.D_DRAW'
+Slack : 0.114
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'game_data:data|draw_state.D_FETCH'
+Slack : 0.354
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'game_ctrl:control|g_curr.G_DISP'
+Slack : 0.389
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'VGA|mypll|altpll_component|auto_generated|generic_pll1~FRACTIONAL_PLL|vcoph[0]'
+Slack : 1.666
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'CLOCK_50'
+Slack : 8.809
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 18.746
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Setup 'game_data:data|draw_state.D_FETCH'
+Slack : -10.302
+TNS   : -122.937
+
+Type  : Fast 1100mV 85C Model Setup 'game_data:data|draw_state.D_DRAW'
+Slack : -9.529
+TNS   : -139.329
+
+Type  : Fast 1100mV 85C Model Setup 'game_ctrl:control|g_curr.G_GAME'
+Slack : -4.591
+TNS   : -81.011
+
+Type  : Fast 1100mV 85C Model Setup 'CLOCK_50'
+Slack : -3.765
+TNS   : -1595.782
+
+Type  : Fast 1100mV 85C Model Setup 'counter[0]'
+Slack : -3.616
+TNS   : -40.338
+
+Type  : Fast 1100mV 85C Model Setup 'game_ctrl:control|g_curr.G_DISP'
+Slack : -2.707
+TNS   : -5.670
+
+Type  : Fast 1100mV 85C Model Setup 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 36.222
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Hold 'CLOCK_50'
+Slack : 0.139
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Hold 'counter[0]'
+Slack : 0.226
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Hold 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 0.241
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Hold 'game_ctrl:control|g_curr.G_DISP'
+Slack : 0.385
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Hold 'game_ctrl:control|g_curr.G_GAME'
+Slack : 0.449
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Hold 'game_data:data|draw_state.D_DRAW'
+Slack : 1.739
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Hold 'game_data:data|draw_state.D_FETCH'
+Slack : 2.056
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'counter[0]'
+Slack : -0.038
+TNS   : -0.075
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'game_ctrl:control|g_curr.G_GAME'
+Slack : 0.135
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'game_data:data|draw_state.D_DRAW'
+Slack : 0.167
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'game_data:data|draw_state.D_FETCH'
+Slack : 0.316
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'game_ctrl:control|g_curr.G_DISP'
+Slack : 0.366
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'VGA|mypll|altpll_component|auto_generated|generic_pll1~FRACTIONAL_PLL|vcoph[0]'
+Slack : 1.666
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'CLOCK_50'
+Slack : 8.789
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 18.885
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Setup 'game_data:data|draw_state.D_FETCH'
+Slack : -9.756
+TNS   : -116.914
+
+Type  : Fast 1100mV 0C Model Setup 'game_data:data|draw_state.D_DRAW'
+Slack : -9.120
+TNS   : -133.460
+
+Type  : Fast 1100mV 0C Model Setup 'game_ctrl:control|g_curr.G_GAME'
+Slack : -4.273
+TNS   : -77.892
+
+Type  : Fast 1100mV 0C Model Setup 'counter[0]'
+Slack : -3.376
+TNS   : -37.082
+
+Type  : Fast 1100mV 0C Model Setup 'CLOCK_50'
+Slack : -2.992
+TNS   : -1227.578
+
+Type  : Fast 1100mV 0C Model Setup 'game_ctrl:control|g_curr.G_DISP'
+Slack : -2.549
+TNS   : -5.182
+
+Type  : Fast 1100mV 0C Model Setup 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 36.607
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Hold 'CLOCK_50'
+Slack : 0.116
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Hold 'counter[0]'
+Slack : 0.206
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Hold 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 0.215
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Hold 'game_ctrl:control|g_curr.G_DISP'
+Slack : 0.297
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Hold 'game_ctrl:control|g_curr.G_GAME'
+Slack : 0.445
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Hold 'game_data:data|draw_state.D_DRAW'
+Slack : 1.795
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Hold 'game_data:data|draw_state.D_FETCH'
+Slack : 1.993
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'counter[0]'
+Slack : -0.004
+TNS   : -0.006
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'game_ctrl:control|g_curr.G_GAME'
+Slack : 0.172
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'game_data:data|draw_state.D_DRAW'
+Slack : 0.224
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'game_data:data|draw_state.D_FETCH'
+Slack : 0.355
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'game_ctrl:control|g_curr.G_DISP'
+Slack : 0.393
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'VGA|mypll|altpll_component|auto_generated|generic_pll1~FRACTIONAL_PLL|vcoph[0]'
+Slack : 1.666
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'CLOCK_50'
+Slack : 8.781
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'VGA|mypll|altpll_component|auto_generated|generic_pll1~PLL_OUTPUT_COUNTER|divclk'
+Slack : 18.884
+TNS   : 0.000
+
+------------------------------------------------------------

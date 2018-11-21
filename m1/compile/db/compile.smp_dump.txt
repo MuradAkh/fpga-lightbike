@@ -1,0 +1,22 @@
+
+State Machine - |main|game_data:data|logic_state
+Name logic_state.C_P2W logic_state.C_P1W logic_state.C_P0W logic_state.C_P2 logic_state.C_P1 logic_state.C_P0 logic_state.M_P2 logic_state.M_P1 logic_state.M_P0 logic_state.W_P2 logic_state.W_P1 logic_state.W_P0 logic_state.L_IDLE 
+logic_state.L_IDLE 0 0 0 0 0 0 0 0 0 0 0 0 0 
+logic_state.W_P0 0 0 0 0 0 0 0 0 0 0 0 1 1 
+logic_state.W_P1 0 0 0 0 0 0 0 0 0 0 1 0 1 
+logic_state.W_P2 0 0 0 0 0 0 0 0 0 1 0 0 1 
+logic_state.M_P0 0 0 0 0 0 0 0 0 1 0 0 0 1 
+logic_state.M_P1 0 0 0 0 0 0 0 1 0 0 0 0 1 
+logic_state.M_P2 0 0 0 0 0 0 1 0 0 0 0 0 1 
+logic_state.C_P0 0 0 0 0 0 1 0 0 0 0 0 0 1 
+logic_state.C_P1 0 0 0 0 1 0 0 0 0 0 0 0 1 
+logic_state.C_P2 0 0 0 1 0 0 0 0 0 0 0 0 1 
+logic_state.C_P0W 0 0 1 0 0 0 0 0 0 0 0 0 1 
+logic_state.C_P1W 0 1 0 0 0 0 0 0 0 0 0 0 1 
+logic_state.C_P2W 1 0 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |main|game_ctrl:control|g_curr
+Name g_curr.G_DISP g_curr.G_IDLE g_curr.G_GAME 
+g_curr.G_IDLE 0 0 0 
+g_curr.G_GAME 0 1 1 
+g_curr.G_DISP 1 1 0 
