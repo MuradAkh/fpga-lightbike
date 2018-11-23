@@ -22,12 +22,12 @@ This week will be focused on implementing core-functionality of the game. Featur
 
 Features such as the following:
 * Any bugs discovered in Week 1
-   * ~~Fix: rendering issues where we get a off-by-one error. Perhaps let the read time run for a few clock cycles more?~~
-   * ~~Fix: about 25% chance of compiling to a version where the player dies upon each keystroke. Perhaps the same issue as above)~~
-   * ~~Fix: the ```DISP_CYCLE``` is not running for the intended amount of time? (32 game ticks)~~
-   * ~~Fix: FSM issues regarding the read-write cycle of game logic. Probably because it gets triggered before the game-clock ticks.~~
-   * ~~Fix: Bug where colours will be mixed up while rendering. Off-by-one issue.~~
-   * Fix: Players interleaving when they land on the same block during the same clock cycle. (It's a feature, not a bug. I promise)
+   * [x] Fix: rendering issues where we get a off-by-one error. Perhaps let the read time run for a few clock cycles more?
+   * [x] Fix: about 25% chance of compiling to a version where the player dies upon each keystroke. Perhaps the same issue as above)
+   * [x] Fix: the ```DISP_CYCLE``` is not running for the intended amount of time? (32 game ticks)
+   * [x] Fix: FSM issues regarding the read-write cycle of game logic. Probably because it gets triggered before the game-clock ticks.
+   * [x] Fix: Bug where colours will be mixed up while rendering. Off-by-one issue.
+   * [ ] Fix: Players interleaving when they land on the same block during the same clock cycle. (It's a feature, not a bug. I promise)
 * Implement collision between players.
 * Refactoring of the code. (Separate FSM and Datapath)
 * Upon death, the player's trail should no longer occupy the board (use port ```b``` for this functionality, as it is controlled by the drawing loop, which runs on 50Mhz. Thus, we can use it to ensure the player's trail is no longer on the board when on the next ```game tick```.)
@@ -37,7 +37,7 @@ At this point, most of the core-functionality of the game should be finished. Ot
 ### Week 3.
 We will use this week to polish up the game, adding additional quality-of-life improvements, as well as fix any previous bugs we have encountered:
 * Any bugs discovered in Week 2
-   * When the draw loop clears the board, sometimes we get visual artifacting. (Perhaps we are counting by two each loop?)
+   * [ ] Fix: When the draw loop clears the board, sometimes we get visual artifacting. (Perhaps we are counting by two each loop?)
 * Implement a score counter, output to hex
 * Implement power-ups such as ```jumping``` to avoid other players' trails
 * Implement ability to select colours without recompiling
