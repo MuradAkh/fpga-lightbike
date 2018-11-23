@@ -4,6 +4,12 @@ module main (
     input [3:0] KEY,
     input [9:0] SW,
     output [9:0] LEDR,
+    output [6:0] HEX5,
+    output [6:0] HEX4,
+    output [6:0] HEX3,
+    output [6:0] HEX2,
+    output [6:0] HEX1,
+    output [6:0] HEX0,
 
     output VGA_CLK,   						//	VGA Clock
     output VGA_HS,							//	VGA H_SYNC
@@ -21,7 +27,10 @@ module main (
     reg [21:0] counter;
     always @(posedge CLOCK_50)
     begin
-        counter <= counter == 22'd0 ? 22'd1500000 : counter - 1'b1;
+		if(~KEY[0])
+			counter <= 22'd0;
+        else
+			counter <= counter == 22'd0 ? 22'd2000000 : counter - 1'b1;
     end
 
     wire game_clk;
@@ -74,14 +83,20 @@ module main (
         run_game,
 
         {
-            make_lut[9'h052],
+            // make_lut[9'h04C], //-> ECF
+            // make_lut[9'h052],
+            // make_lut[9'h033],
+            // make_lut[9'h03B],
+            // make_lut[9'h01C], 
+            // make_lut[9'h01B]
+            make_lut[9'h052], //-> PERSONAL
             make_lut[9'h05D],
             make_lut[9'h033],
             make_lut[9'h03B],
             make_lut[9'h01C], 
             make_lut[9'h01B]
         },
-
+		
         colour,
         x,
         y,
@@ -89,7 +104,14 @@ module main (
 
         round_finished,
         disp_continue,
-        LEDR[9:2]
+        LEDR[9:2],
+
+        HEX5,
+        HEX4,
+        HEX3,
+        HEX2,
+        HEX1,
+        HEX0
     );
 
     // Create the colour, x, y and writeEn wires that are inputs to the controller.
@@ -196,18 +218,191 @@ module game_data(
     // 11 represents same dir
     // 00 represents same dir
     input [5:0] turn,
-    
+	
     // r, g, b, 2 bits each
-    output reg [5:0] colour,    
-    output reg [7:0] x,
-    output reg [6:0] y,
-    output reg plot,
+    output [5:0] colour,    
+    output [7:0] x,
+    output [6:0] y,
+    output plot,
 
     output round_finished,
     output disp_continue,
 
-    output [7:0] LEDR
+    output [7:0] LEDR,
+    output [6:0] HEX5,
+    output [6:0] HEX4,
+    output [6:0] HEX3,
+    output [6:0] HEX2,
+    output [6:0] HEX1,
+    output [6:0] HEX0
+
 );
+
+    // RAM 
+    // PORT a -> game logic
+    // PORT b -> draw logic
+    wire [12:0] address_a, address_b;
+
+    wire [1:0] data_a, data_b;
+
+    wire wren_a, wren_b;
+
+    wire [1:0] q_a, q_b;
+
+    ram game_state(
+        address_a,
+        address_b,
+        CLOCK_50,
+        data_a,
+        data_b,
+        wren_a,
+        wren_b,
+        q_a,
+        q_b
+    );
+
+    wire [2:0] p_state;
+    assign LEDR[7:5] = p_state;
+
+    ram_port_a_controls game_logic(
+        CLOCK_50,
+        game_clk,
+
+        q_a,
+        wren_a,
+        address_a,
+        data_a,
+
+        reset_game,
+        run_game,
+        turn,
+        disp_continue,
+        round_finished,
+        p_state
+    );
+
+    ram_port_b_controls draw_death(
+        CLOCK_50,
+        q_b,
+        wren_b,
+        address_b,
+        data_b,
+
+        x,
+        y,
+        colour,
+        plot,
+
+        p_state,
+        reset_n
+    );
+
+
+    wire [23:0] scores;
+
+
+    round_counter score(
+        game_clk,
+        reset_n,
+        round_finished,
+        p_state,
+        scores
+    );
+
+    hex_to_dec p0(
+        scores[7:0],
+        HEX5,
+        HEX4
+    );
+
+    hex_to_dec p1(
+        scores[15:8],
+        HEX3,
+        HEX2
+    );
+
+    hex_to_dec p2(
+        scores[23:16],
+        HEX1,
+        HEX0
+    );
+
+endmodule
+
+module hex_to_dec(
+    input [7:0] score,
+    output [6:0] HEX1,
+    output [6:0] HEX0
+);
+
+    segment h1(
+        score / 10,
+        HEX1
+    );
+
+    segment h0(
+        score % 10,
+        HEX0
+    );
+
+endmodule
+
+module round_counter(
+    input game_clk,
+    input reset_n,
+    input round_finished,
+    input [2:0] p_state,
+    output reg [23:0] scores
+);
+
+    reg prev;
+
+    always @(posedge game_clk) begin
+        if(~reset_n) begin
+            prev = 1'b0; 
+            scores <= 24'd0;
+        end begin
+            if(round_finished == 1'b1 && prev == 1'b0)
+                scores <= {
+                    scores[23:16] + p_state[2],
+                    scores[15:8] + p_state[1],
+                    scores[7:0] + p_state[0]
+                };
+            prev <= round_finished;
+        end
+    end
+endmodule
+
+
+module ram_port_a_controls(
+
+    /* RAM CONTROLS */
+    input CLOCK_50,
+    input game_clk,
+    input [1:0] q_a,
+    output reg wren_a,
+    output reg [12:0] address_a,
+    output reg [1:0] data_a,
+
+    /* GAME LOGIC */
+    input reset_game,
+    input run_game,
+    input [5:0] turn,
+    output disp_continue,
+    output round_finished,
+    output reg [2:0] p_state
+);
+
+
+    assign round_finished = ^p_state && ~&p_state || ~|p_state; // round is finished when one or zero player standing
+
+    // reg [2:0] p_in_air;
+    reg [6:0] p_pos_x [2:0];
+    reg [5:0] p_pos_y [2:0];
+
+    // 00 is up, 01 is right, 10 is down, 11 is left
+    reg [1:0] p_dir [2:0];
+
     wire [1:0] turning_dir [2:0];
     assign {turning_dir[2], turning_dir[1], turning_dir[0]} = turn;
 
@@ -217,21 +412,9 @@ module game_data(
         P1 = 2'd1,
         P2 = 2'd2,
         PE = 2'd3,
-        
-        P0_C = 6'b011111,
-        P1_C = 6'b001100,
-        P2_C = 6'b111000,
-        PE_C = 6'b000001,
-        // P0_C = 6'b110000,
-        // P1_C = 6'b001100,
-        // P2_C = 6'b000011,
-        // PE_C = 6'b000000,
 
         WIDTH = 7'd80,
         HEIGHT = 6'd60,
-        
-        D_WIDTH = 8'd160,
-        D_HEIGHT = 7'd120,
         
         L_IDLE = 4'd0,
         W_P0 = 4'd1,
@@ -250,50 +433,11 @@ module game_data(
         C_P2W = 4'd12,
         C_P0W2 = 4'd13,
         C_P1W2 = 4'd14,
-        C_P2W2 = 4'd15;        
-
-    reg [2:0] p_state;
-    assign round_finished = ^p_state && ~&p_state || ~|p_state; // round is finished when one or zero player standing
-    // assign round_finished = 1'b0;
-
-    // reg [2:0] p_in_air;
-    reg [6:0] p_pos_x [2:0];
-    reg [5:0] p_pos_y [2:0];
-
-    assign LEDR[7:5] = p_state;
-    // 00 is up, 01 is right, 10 is down, 11 is left
-    reg [1:0] p_dir [2:0];
-
-
-    // RAM 
-    // PORT a -> game logic
-    // PORT b -> draw logic
-    reg [12:0] address_a;
-    reg [12:0] address_b;
-
-    reg [1:0] data_a, data_b;
-
-    reg wren_a;
-    reg wren_b;
-
-    wire [1:0] q_a, q_b;
-
-    ram game_state(
-        address_a,
-        address_b,
-        CLOCK_50,
-        data_a,
-        data_b,
-        wren_a,
-        wren_b,
-        q_a,
-        q_b
-    );
-
+        C_P2W2 = 4'd15;       
 
     // counter to let the game wait 32 ticks until starting
     reg [4:0] disp_counter;
-    assign disp_continue = disp_counter == 0;
+    assign disp_continue = disp_counter == 5'd0;
 
     reg [12:0] reset_counter;
 
@@ -325,16 +469,25 @@ module game_data(
                 C_P0W: begin
                     address_a = p_pos_x[0] + p_pos_y[0] * WIDTH;
                 end
+                C_P0W2: begin
+                    address_a = p_pos_x[0] + p_pos_y[0] * WIDTH;
+                end
                 C_P0: begin
                     address_a = p_pos_x[0] + p_pos_y[0] * WIDTH;
                 end
                 C_P1W: begin
                     address_a = p_pos_x[1] + p_pos_y[1] * WIDTH;
                 end
+                C_P1W2: begin
+                    address_a = p_pos_x[1] + p_pos_y[1] * WIDTH;
+                end
                 C_P1: begin
                     address_a = p_pos_x[1] + p_pos_y[1] * WIDTH;
                 end
                 C_P2W: begin
+                    address_a = p_pos_x[2] + p_pos_y[2] * WIDTH;
+                end
+                C_P2W2: begin
                     address_a = p_pos_x[2] + p_pos_y[2] * WIDTH;
                 end
                 C_P2: begin
@@ -364,7 +517,7 @@ module game_data(
         end else if(reset_game) begin
             wren_a <= 1'b1;
             address_a <= reset_counter;
-            data_a <= 2'b11;
+            data_a <= PE;
         end else begin end
     end
 
@@ -457,85 +610,61 @@ module game_data(
 
         end
     end
-            // all the run game logic, 
-            // update player positions
-            // then first clear the board if player is dead
 
-            // player movement
-            // integer player;
-            // integer i;
+endmodule
 
-            // for(player = 0; player < 3; player = player + 1) begin
+module ram_port_b_controls(
 
-            //     // check if player is still alive
-            //     if(p_state[player] == 1'b1) begin
-            //         // turn player
-            //         case(turning_dir[player])
-            //             2'b01: p_dir[player] = p_dir[player] + 1;
-            //             2'b10: p_dir[player] = p_dir[player] - 1;
-            //             default:;
-            //         endcase
+    /* RAM CONTROLS */
+    input CLOCK_50,
+    input [1:0] q_b,
+    output reg wren_b,
+    output reg [12:0] address_b,
+    output reg [1:0] data_b,
 
-            //         // movement
-            //         case(p_dir[player])
-            //             2'b00: begin // up
-            //                 if(p_pos_y[player] <= 0) p_state[player] = 1'b0;
-            //                 else p_pos_y[player] = p_pos_y[player] - 1'b1;
-            //             end
-            //             2'b10: begin // down
-            //                 if(p_pos_y[player] >= HEIGHT - 1) p_state[player] = 1'b0;
-            //                 else p_pos_y[player] = p_pos_y[player] + 1'b1;
-            //             end
-            //             2'b11: begin // left
-            //                 if(p_pos_x[player] <= 0) p_state[player] = 1'b0;
-            //                 else p_pos_x[player] = p_pos_x[player] - 1'b1;
-            //             end
-            //             2'b01: begin // right
-            //                 if(p_pos_x[player] >= WIDTH - 1) p_state[player] = 1'b0;
-            //                 else p_pos_x[player] = p_pos_x[player] + 1'b1;
-            //             end
-            //         endcase
+    /* SCREEN CONTROLS */
+    output reg [7:0] x,
+    output reg [6:0] y,
+    output reg [5:0] colour,
+    output reg plot,
 
-            //         // kill player if this block is not empty
-            //         if(g_state[player][p_pos_x[player]][p_pos_y[player]] != PE) p_state[player] = 1'b0;
-            //     end
-            // end
-
-            // for(player = 0; player < 3; player = player + 1) begin
-            //     if(p_state[player] == 1'b1) begin
+    /* OTHER */
+    input [2:0] p_state,
+    input reset_n
+);
 
 
-            //         p_pos_x[player] <= p_pos_x[player] + 1'b1;
-            //         p_pos_y[player] <= p_pos_y[player] + 1'b1;
-            //     end
+    localparam
+        P0 = 2'd0,
+        P1 = 2'd1,
+        P2 = 2'd2,
+        PE = 2'd3,
+        
+        
+        P0_C = 6'b011111,
+        P1_C = 6'b001100,
+        P2_C = 6'b111000,
+        PE_C = 6'b000001,
+        // P0_C = 6'b110000,
+        // P1_C = 6'b001100,
+        // P2_C = 6'b000011,
+        // PE_C = 6'b000000,
 
-            //     if (p_state[player] == 1'b1) begin
-            //         g_state[p_pos_x[player]][p_pos_y[player]] = player;
-            //     end
-            // end
+        WIDTH = 7'd80,
+        HEIGHT = 6'd60,
 
-
-            // // clear board
-            // for(i = 0; i < WIDTH * HEIGHT; i = i + 1) begin
-            //     case(g_state[i % WIDTH][i / WIDTH])
-            //         P0: g_state[i % WIDTH][i / WIDTH] <= p_state[0] ? P0 : PE;
-            //         P1: g_state[i % WIDTH][i / WIDTH] <= p_state[1] ? P1 : PE;
-            //         P2: g_state[i % WIDTH][i / WIDTH] <= p_state[2] ? P2 : PE;
-            //         default: g_state[i % WIDTH][i / WIDTH] <= PE;
-            //     endcase
-            // end
-
+        D_WIDTH = 8'd160,
+        D_HEIGHT = 7'd120;      
 
     /* DRAWING */
-
     reg [14:0] draw_counter;
 
     localparam D_FETCH = 2'd0, D_FETCH2 = 2'd1, D_DRAW = 2'd2;
     reg [1:0] draw_state, next_draw_state;
 
-
+    /* DRAW COUNTER */
     always @(posedge CLOCK_50)
-    begin: d_transitions
+    begin: d_counter
         if(!reset_n) begin
             draw_state = D_FETCH;
             draw_counter <= 0;
@@ -579,14 +708,6 @@ module game_data(
                     PE: colour = PE_C;
                 endcase
 
-                // fade to black
-
-                // colour = {
-                //     colour[5:4] * (disp_counter) / (5'b11111),
-                //     colour[3:2] * (disp_counter) / (5'b11111),
-                //     colour[1:0] * (disp_counter) / (5'b11111),
-                // };
-
                 if(q_b != PE && !p_state[q_b]) begin
                     wren_b = 1'b1;
                     data_b <= PE;
@@ -594,5 +715,6 @@ module game_data(
             end
         endcase
     end
+
 
 endmodule
