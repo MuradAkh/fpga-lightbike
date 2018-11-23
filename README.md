@@ -1,5 +1,4 @@
 ![Logo][logo]
-# Light Bikes on FPGA
 
 Light bikes on FPGA is a locally-multiplayer game, inspired by the popular movie [Tron][tron]. It involves up to 3 players, each with their own uniquely-coloured bike on a game board. Much like the game Snake, any player who touches the boundaries or any trail left behind by the players will immediately die. Rounds are counted up in the end to determine the winner of the game, and the last person standing will win each round.
 
@@ -23,11 +22,11 @@ This week will be focused on implementing core-functionality of the game. Featur
 
 Features such as the following:
 * Any bugs discovered in Week 1
-   * Fix: rendering issues where we get a off-by-one error. Perhaps let the read time run for a few clock cycles more?
+   * ~~Fix: rendering issues where we get a off-by-one error. Perhaps let the read time run for a few clock cycles more?~~
    * Fix: about 25% chance of compiling to a version where the player dies upon each keystroke. Perhaps the same issue as above)
-   * Fix: the ```DISP_CYCLE``` is not running for the intended amount of time? (32 game ticks)
-   * Fix: FSM issues regarding the read-write cycle of game logic. Probably because it gets triggered before the game-clock ticks.
-   * Fix: Bug where colours will be mixed up while rendering. Off-by-one issue.
+   * ~~Fix: the ```DISP_CYCLE``` is not running for the intended amount of time? (32 game ticks)~~
+   * ~~Fix: FSM issues regarding the read-write cycle of game logic. Probably because it gets triggered before the game-clock ticks.~~
+   * ~~Fix: Bug where colours will be mixed up while rendering. Off-by-one issue.~~
    * Fix: Players interleaving when they land on the same block during the same clock cycle. (It's a feature, not a bug. I promise)
 * Implement collision between players.
 * Refactoring of the code. (Separate FSM and Datapath)
