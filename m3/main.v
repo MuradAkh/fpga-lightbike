@@ -24,8 +24,20 @@ module main (
     input PS2_DAT
 );
 
+
+    wire halfclock;
+    assign halfclock = CLOCK_50;
+
+    // reg [5:0] half;
+    // always @(posedge CLOCK_50) begin
+	// 	if(~KEY[0])
+	// 		half <= 6'd0;
+    //     else
+    //         half <= half == 6'd0 ? 6'd50 : half - 1'b1;
+    // end
+
     reg [21:0] counter;
-    always @(posedge CLOCK_50)
+    always @(posedge halfclock)
     begin
 		if(~KEY[0]) begin
 			counter <= 22'd0;
@@ -35,6 +47,7 @@ module main (
     end
 
 
+
     wire game_clk;
     assign game_clk = counter == 0;
 
@@ -42,7 +55,7 @@ module main (
     wire [511:0] make_lut, persist_lut, break_lut;
 
     controller keyboard(
-        CLOCK_50,
+        halfclock,
         PS2_CLK,
         PS2_DAT,
         KEY[0],
@@ -58,11 +71,11 @@ module main (
 
     wire round_finished, disp_continue, reset_game, run_game;
     wire enter_pressed;
-    assign enter_pressed = make_lut[9'h05A];
+    assign enter_pressed = make_lut[9'h15A];
 
 
     game_ctrl control(
-        CLOCK_50,
+        halfclock,
         game_clk,
         KEY[0],
 
@@ -77,7 +90,7 @@ module main (
     );
 
     game_data data(
-        CLOCK_50,
+        halfclock,
         game_clk,
         KEY[0],
 
@@ -89,22 +102,22 @@ module main (
             // make_lut[9'h052],
             // make_lut[9'h033],
             // make_lut[9'h03B],
-            // make_lut[9'h01C], 
+            // make_lut[9'h01C],
             // make_lut[9'h01B]
-            make_lut[9'h04C], //-> PERSONAL
-            make_lut[9'h052],
-            make_lut[9'h033],
+            make_lut[9'h069], //-> PERSONAL
+            make_lut[9'h072],
             make_lut[9'h03B],
-            make_lut[9'h01C], 
+            make_lut[9'h042],
+            make_lut[9'h01C],
             make_lut[9'h01B]
         },
 
         {
-            make_lut[9'h05D],
-            make_lut[9'h033],
+            make_lut[9'h07A],
+            make_lut[9'h04B],
             make_lut[9'h023]
         },
-		
+
         colour,
         x,
         y,
@@ -121,7 +134,8 @@ module main (
         HEX1,
         HEX0,
 
-        {SW[0], SW[1], SW[2]}
+        {SW[0], SW[1], SW[2]},
+        SW[3]
     );
 
     // Create the colour, x, y and writeEn wires that are inputs to the controller.
@@ -153,15 +167,15 @@ module main (
 		defparam VGA.MONOCHROME = "FALSE";
 		defparam VGA.BITS_PER_COLOUR_CHANNEL = 2;
 		defparam VGA.BACKGROUND_IMAGE = "black.mif";
-			
+
 
 endmodule
 
 module game_ctrl (
-    input CLOCK_50, // 50 Mhz 
+    input CLOCK_50, // 50 Mhz
     input game_clk, // 20 hz
     input reset_n,
-    
+
     // inputs from datapath
     input round_finished,
     input disp_continue,
@@ -176,7 +190,7 @@ module game_ctrl (
     output [1:0] LEDR
 );
 
-    localparam 
+    localparam
         G_IDLE = 2'd1,  // wait for player to start
         G_GAME = 2'd2,  // game state
         G_DISP = 2'd3;  // pause to give players time to reset
@@ -198,7 +212,7 @@ module game_ctrl (
             G_IDLE: g_next <= enter_pressed ? G_GAME : G_IDLE;
             G_GAME: g_next <= round_finished ? G_DISP : G_GAME;
             G_DISP: g_next <= disp_continue ? G_IDLE : G_DISP;
-        endcase 
+        endcase
     end
 
     always @(*)
@@ -219,7 +233,7 @@ module game_data(
     input CLOCK_50,
     input game_clk,
     input reset_n,
-    
+
     input reset_game,
     input run_game,
 
@@ -229,9 +243,9 @@ module game_data(
     // 00 represents same dir
     input [5:0] turn,
     input [2:0] power,
-	
+
     // r, g, b, 2 bits each
-    output [5:0] colour,    
+    output [5:0] colour,
     output [7:0] x,
     output [6:0] y,
     output plot,
@@ -247,11 +261,12 @@ module game_data(
     output [6:0] HEX1,
     output [6:0] HEX0,
 
-    input [2:0] initial_players
+    input [2:0] initial_players,
+    input usepowerups
 
 );
 
-    // RAM 
+    // RAM
     // PORT a -> game logic
     // PORT b -> draw logic
     wire [12:0] address_a, address_b;
@@ -293,13 +308,19 @@ module game_data(
         run_game,
         turn,
         power,
+        
+        usepowerups,
+
         disp_continue,
         round_finished,
+
         p_state,
         p_powerup,
         p_powerup_remaining,
 
-        initial_players
+        initial_players,
+
+        LEDR[4:0]
     );
 
     ram_port_b_controls draw_death(
@@ -383,7 +404,7 @@ module round_counter(
 
     always @(posedge game_clk) begin
         if(~reset_n) begin
-            prev = 1'b0; 
+            prev <= 1'b0;
             scores <= 24'd0;
         end begin
             if(round_finished == 1'b1 && prev == 1'b0)
@@ -414,19 +435,24 @@ module ram_port_a_controls(
     input [5:0] turn,
     input [2:0] power,
 
+    input usepowerups,
+
     output disp_continue,
     output round_finished,
     output reg [2:0] p_state,
     output reg [2:0] p_powerup,
     output [2:0] p_powerup_remaining_out,
 
-    input [2:0] initial_players
-);
+    input [2:0] initial_players,
 
+    output [4:0] LEDR
+);
+    assign LEDR = disp_counter;
 
     assign round_finished = ^p_state && ~&p_state || ~|p_state; // round is finished when one or zero player standing
 
     reg [5:0] p_powerup_remaining [2:0];
+    reg [6:0] p_powerup_cooldown [2:0];
     assign p_powerup_remaining_out = {p_powerup_remaining[2] > 0, p_powerup_remaining[1] > 0, p_powerup_remaining[0] > 0};
 
     reg [6:0] p_pos_x [2:0];
@@ -447,7 +473,7 @@ module ram_port_a_controls(
 
         WIDTH = 7'd80,
         HEIGHT = 6'd60,
-        
+
         L_IDLE = 4'd0,
         W_P0 = 4'd1,
         W_P1 = 4'd2,
@@ -463,7 +489,7 @@ module ram_port_a_controls(
         C_P2W = 4'd12,
         C_P0W2 = 4'd13,
         C_P1W2 = 4'd14,
-        C_P2W2 = 4'd15;       
+        C_P2W2 = 4'd15;
 
     // counter to let the game wait 32 ticks until starting
     reg [4:0] disp_counter;
@@ -479,6 +505,8 @@ module ram_port_a_controls(
         wren_a = 1'b0;
         data_a = PE;
         address_a = 0;
+        next_logic_state = L_IDLE;
+
         if(run_game) begin
 
             case(logic_state)
@@ -524,7 +552,7 @@ module ram_port_a_controls(
                     address_a = p_pos_x[2] + p_pos_y[2] * WIDTH;
                     data_a = P2;
                 end
-                default:;   
+                default:;
             endcase
 
             case(logic_state)
@@ -553,13 +581,16 @@ module ram_port_a_controls(
     always @(posedge game_clk) begin
         if(reset_game) begin
             p_dir[2] = 2'd1;
-            p_dir[1] = 2'd3;
-            p_dir[0] = 2'd0;
+            p_dir[1] = 2'd0;
+            p_dir[0] = 2'd3;
             disp_counter <= 5'b11111;
-            p_powerup <= 3'b111; // TODO: CHANGE
+            p_powerup <= 3'b000;
             p_powerup_remaining[0] <= 6'd0;
             p_powerup_remaining[1] <= 6'd0;
             p_powerup_remaining[2] <= 6'd0;
+            p_powerup_cooldown[0] <= 7'd1111111;
+            p_powerup_cooldown[1] <= 7'd1111111;
+            p_powerup_cooldown[2] <= 7'd1111111;
         end else if(run_game) begin
             integer player;
             for(player = 0; player < 3; player = player + 1) begin
@@ -569,11 +600,15 @@ module ram_port_a_controls(
                     default:;
                 endcase
 
-                if(power[player] && p_powerup[player]) begin
-                    p_powerup_remaining[player] <= p_powerup_remaining[player] - 1;
+                if(!p_powerup[player]) begin
+                    if(p_powerup_remaining[player]) p_powerup_remaining[player] <= p_powerup_remaining[player] - 1;
+                    else begin
+                        p_powerup_cooldown[player] <= p_powerup_cooldown[player] - 1;
+                        if(!p_powerup_cooldown[player] && usepowerups) p_powerup[player] <= 1'b1;
+                    end
+                end else if(power[player]) begin
                     p_powerup[player] <= 1'b0;
-                end else begin
-                    p_powerup_remaining[player] <= p_powerup_remaining[player] == 0 ? p_powerup_remaining[player] : p_powerup_remaining[player] - 1;
+                    p_powerup_remaining[player] <= p_powerup_remaining[player] - 1'b1;
                 end
 
             end
@@ -586,14 +621,14 @@ module ram_port_a_controls(
     begin: game_logic
         if(reset_game) begin
             p_state <= initial_players;
-            
+
             p_pos_x[2] <= 8'd45;
-            p_pos_x[1] <= 8'd35;
-            p_pos_x[0] <= 8'd40;
+            p_pos_x[1] <= 8'd40;
+            p_pos_x[0] <= 8'd35;
 
             p_pos_y[2] <= 7'd35;
-            p_pos_y[1] <= 7'd35;
-            p_pos_y[0] <= 7'd25;
+            p_pos_y[1] <= 7'd25;
+            p_pos_y[0] <= 7'd35;
 
             logic_state <= L_IDLE;
 
@@ -620,13 +655,13 @@ module ram_port_a_controls(
                 end
                 C_P1: begin
                     if(
-                        (q_a != PE && !p_powerup_remaining[1]) || 
+                        (q_a != PE && !p_powerup_remaining[1]) ||
                         p_pos_x[1] >= WIDTH ||
                         p_pos_y[1] >= HEIGHT) p_state[1] = 1'b0;
                 end
                 C_P2: begin
                     if(
-                        (q_a != PE && !p_powerup_remaining[2]) || 
+                        (q_a != PE && !p_powerup_remaining[2]) ||
                         p_pos_x[2] >= WIDTH ||
                         p_pos_y[2] >= HEIGHT) p_state[2] = 1'b0;
                 end
@@ -669,48 +704,65 @@ module ram_port_b_controls(
         P1 = 2'd1,
         P2 = 2'd2,
         PE = 2'd3,
-        
-        
-        P0_C = 6'b011111,
-        P0_CS = 6'b000111,
 
-        P1_C = 6'b001100,
-        P1_CS = 6'b101100,
+
+        P0_C = 6'b101100,
+        P0_CS = 6'b000100,
+
+        P1_C = 6'b011111,
+        P1_CS = 6'b000111,
 
         P2_C = 6'b111000,
         P2_CS = 6'b110100,
-        
+
         PE_C = 6'b000001,
 
         WIDTH = 7'd80,
         HEIGHT = 6'd60,
 
         D_WIDTH = 8'd160,
-        D_HEIGHT = 7'd120;      
+        D_HEIGHT = 7'd120;
 
     /* DRAWING */
-    reg [14:0] draw_counter;
+    // reg [14:0] draw_counter;
+    reg [7:0] d_x;
+    reg [6:0] d_y;
 
     localparam
-        D_FETCH = 3'd0, 
-        D_FETCH2 = 3'd1, 
-        D_DRAW1 = 3'd2,
-        D_DRAW2 = 3'd3,
-        D_DRAW3 = 3'd4,
-        D_DRAW4 = 3'd5;
+        D_FETCH = 3'd0,
+        D_FETCH2 = 3'd1,
+        D_FETCH3 = 3'd2,
+        D_DRAW1 = 3'd3,
+        D_DRAW2 = 3'd4,
+        D_DRAW3 = 3'd5,
+        D_DRAW4 = 3'd6,
+        D_INC = 3'd7;
 
     reg [2:0] draw_state, next_draw_state;
+
+
 
     /* DRAW COUNTER */
     always @(posedge CLOCK_50)
     begin: d_counter
         if(!reset_n) begin
             draw_state = D_FETCH;
-            draw_counter <= 0;
+            d_x <= 8'd0;
+            d_y <= 7'd0;
+            // draw_counter <= 0;
         end
-        else begin 
+        else begin
             draw_state = next_draw_state;
-            if(draw_state == D_FETCH) draw_counter <= draw_counter == 15'd0 ? WIDTH * HEIGHT - 1 : draw_counter - 1; 
+            if(draw_state == D_INC) begin
+                //draw_counter <= draw_counter == 15'd0 ? WIDTH * HEIGHT - 1 : draw_counter - 1;
+                if(d_x == 0) begin
+                    d_y <= d_y == 0 ? HEIGHT - 1'b1 : d_y - 1'b1; 
+                    d_x = WIDTH;
+                end
+
+                d_x = d_x - 1'b1;
+
+            end
         end
     end
 
@@ -718,11 +770,13 @@ module ram_port_b_controls(
     begin: d_fsm
         case(draw_state)
             D_FETCH: next_draw_state <= D_FETCH2;
-            D_FETCH2: next_draw_state <= D_DRAW1;
+            D_FETCH2: next_draw_state <= D_FETCH3;
+            D_FETCH3: next_draw_state <= D_DRAW1;
             D_DRAW1: next_draw_state <= D_DRAW2;
             D_DRAW2: next_draw_state <= D_DRAW3;
             D_DRAW3: next_draw_state <= D_DRAW4;
-            D_DRAW4: next_draw_state <= D_FETCH;
+            D_DRAW4: next_draw_state <= D_INC;
+            D_INC: next_draw_state <= D_FETCH;
         endcase
     end
 
@@ -731,36 +785,34 @@ module ram_port_b_controls(
 
     always @(*)
     begin: d_control
-        wren_b = 1'b0;
-        plot = 1'b0;
         data_b <= PE;
-
         x_off <= draw_state == D_DRAW2 || draw_state == D_DRAW4;
         y_off <= draw_state == D_DRAW3 || draw_state == D_DRAW4;
 
 
         case(draw_state)
+            D_FETCH, D_FETCH2, D_FETCH3: begin
+                address_b <= d_x + d_y * WIDTH;
+                wren_b <= 1'b0;
+                plot <= 1'b0;
+            end
+            D_DRAW1, D_DRAW2, D_DRAW3, D_DRAW4: begin
+                x = {d_x, x_off};
+                y = {d_y, y_off};
 
-            D_FETCH: begin
-                address_b <= draw_counter;
-            end
-            D_FETCH2: begin
-                address_b <= draw_counter;
-            end
-            D_DRAW1, D_DRAW2, D_DRAW3, D_DRAW4: begin 
-                x <= {draw_counter % WIDTH, x_off};
-                y <= {draw_counter / WIDTH, y_off};
-                plot = 1'b1;
+                plot <= 1'b1;
                 if(q_b != PE && !p_state[q_b]) begin
                     wren_b = 1'b1;
-                end
+                end else wren_b = 1'b0;
+            end
+            D_INC: begin
             end
         endcase
 
         case(q_b)
-            P0: colour = p_powerup_remaining[0] ? P0_CS : p_powerup[0] ? (x[0] ^ y[0] ? P0_CS : P0_C) : P0_C;
-            P1: colour = p_powerup_remaining[1] ? P1_CS : p_powerup[1] ? (x[0] ^ y[0] ? P1_CS : P1_C) : P1_C;
-            P2: colour = p_powerup_remaining[2] ? P2_CS : p_powerup[2] ? (x[0] ^ y[0] ? P2_CS : P2_C) : P2_C;
+            P0: colour = p_powerup_remaining[0] ? P0_CS : p_powerup[0] ? (d_x[0] ^ d_y[0] ? P0_CS : P0_C) : P0_C;
+            P1: colour = p_powerup_remaining[1] ? P1_CS : p_powerup[1] ? (d_x[0] ^ d_y[0] ? P1_CS : P1_C) : P1_C;
+            P2: colour = p_powerup_remaining[2] ? P2_CS : p_powerup[2] ? (d_x[0] ^ d_y[0] ? P2_CS : P2_C) : P2_C;
             PE: colour = PE_C;
         endcase
     end

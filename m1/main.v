@@ -74,8 +74,8 @@ module main (
         run_game,
 
         {
+            make_lut[9'h04C],
             make_lut[9'h052],
-            make_lut[9'h05D],
             make_lut[9'h033],
             make_lut[9'h03B],
             make_lut[9'h01C], 

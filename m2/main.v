@@ -111,7 +111,9 @@ module main (
         HEX3,
         HEX2,
         HEX1,
-        HEX0
+        HEX0,
+
+        {SW[0], SW[1], SW[2]}
     );
 
     // Create the colour, x, y and writeEn wires that are inputs to the controller.
@@ -234,7 +236,9 @@ module game_data(
     output [6:0] HEX3,
     output [6:0] HEX2,
     output [6:0] HEX1,
-    output [6:0] HEX0
+    output [6:0] HEX0,
+
+    input [2:0] initial_players
 
 );
 
@@ -278,7 +282,9 @@ module game_data(
         turn,
         disp_continue,
         round_finished,
-        p_state
+        p_state,
+
+        initial_players
     );
 
     ram_port_b_controls draw_death(
@@ -390,7 +396,9 @@ module ram_port_a_controls(
     input [5:0] turn,
     output disp_continue,
     output round_finished,
-    output reg [2:0] p_state
+    output reg [2:0] p_state,
+
+    input [2:0] initial_players
 );
 
 
@@ -450,7 +458,7 @@ module ram_port_a_controls(
             wren_a = 1'b0;
             data_a = PE;
             
-            case(next_logic_state)
+            case(logic_state)
                 W_P0: begin
                     wren_a = p_state[0];
                     address_a = p_pos_x[0] + p_pos_y[0] * WIDTH;
@@ -497,13 +505,7 @@ module ram_port_a_controls(
             endcase
 
             case(logic_state)
-                L_IDLE: next_logic_state <= game_clk ? W_P0 : L_IDLE;
-                W_P0: next_logic_state <= W_P1;
-                W_P1: next_logic_state <= W_P2;
-                W_P2: next_logic_state <= M_P0;
-                M_P0: next_logic_state <= M_P1;
-                M_P1: next_logic_state <= M_P2;
-                M_P2: next_logic_state <= C_P0W;
+                L_IDLE: next_logic_state <= game_clk ? C_P0W : L_IDLE;
                 C_P0W: next_logic_state <= C_P0W2;
                 C_P0W2: next_logic_state <= C_P0;
                 C_P0: next_logic_state <= C_P1W;
@@ -512,7 +514,13 @@ module ram_port_a_controls(
                 C_P1: next_logic_state <= C_P2W;
                 C_P2W: next_logic_state <= C_P2W2;
                 C_P2W2: next_logic_state <= C_P2;
-                C_P2: next_logic_state <= L_IDLE;
+                C_P2: next_logic_state <= W_P0;
+                W_P0: next_logic_state <= W_P1;
+                W_P1: next_logic_state <= W_P2;
+                W_P2: next_logic_state <= M_P0;
+                M_P0: next_logic_state <= M_P1;
+                M_P1: next_logic_state <= M_P2;
+                M_P2: next_logic_state <= L_IDLE;
             endcase
         end else if(reset_game) begin
             wren_a <= 1'b1;
@@ -545,7 +553,7 @@ module ram_port_a_controls(
     begin: game_logic
         if(reset_game) begin
 
-            p_state <= 3'b111;
+            p_state <= initial_players;
             
             p_pos_x[2] <= 8'd45;
             p_pos_x[1] <= 8'd35;
@@ -697,8 +705,8 @@ module ram_port_b_controls(
             D_FETCH2: begin
             end
             D_DRAW: begin
-                x <= draw_counter % D_WIDTH;
-                y <= draw_counter / D_WIDTH;
+                x = draw_counter % D_WIDTH;
+                y = draw_counter / D_WIDTH;
                 plot = 1'b1;
 
                 case(q_b)
