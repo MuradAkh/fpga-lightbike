@@ -37,12 +37,12 @@ At this point, most of the core-functionality of the game should be finished. Ot
 ### Week 3.
 We will use this week to polish up the game, adding additional quality-of-life improvements, as well as fix any previous bugs we have encountered:
 * Any bugs discovered in Week 2
-   * [ ] Fix: When the draw loop clears the board, sometimes we get visual artifacting. (Perhaps we are counting by two each loop?)
+   * [x] Fix: When the draw loop clears the board, sometimes we get visual artifacting. (Perhaps we are counting by two each loop?)
 * Implement a score counter, output to hex
 * Implement power-ups such as ```jumping``` to avoid other players' trails
-* Implement ability to select colours without recompiling
+* ~~Implement ability to select colours without recompiling~~
 * Let the players choose how many players will play (during runtime)
-* Implement a pause? (unsure about this one, will do if we have time. Worst comes to worst, just halt the ```game clock``` when pause is clicked.)
+* ~~Implement a pause? (unsure about this one, will do if we have time. Worst comes to worst, just halt the ```game clock``` when pause is clicked.)~~
 * Fading the screen between transitions (although we only have ```2-bit``` colour channels, not sure how this would look in the end)
 
 After this week, the game will be done!

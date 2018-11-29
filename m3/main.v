@@ -36,13 +36,13 @@ module main (
     //         half <= half == 6'd0 ? 6'd50 : half - 1'b1;
     // end
 
-    reg [21:0] counter;
+    reg [20:0] counter;
     always @(posedge halfclock)
     begin
 		if(~KEY[0]) begin
 			counter <= 22'd0;
         end else begin
-			counter <= counter == 22'd0 ? 22'd2000000 : counter - 1'b1;
+			counter <= counter == 21'd0 ? 21'd2000000 : counter - 1'b1;
         end
     end
 
@@ -98,24 +98,27 @@ module main (
         run_game,
 
         {
-            // make_lut[9'h04C], //-> ECF
-            // make_lut[9'h052],
-            // make_lut[9'h033],
-            // make_lut[9'h03B],
-            // make_lut[9'h01C],
-            // make_lut[9'h01B]
-            make_lut[9'h069], //-> PERSONAL
+            make_lut[9'h069], //-> ECF
             make_lut[9'h072],
+            make_lut[9'h033],
             make_lut[9'h03B],
-            make_lut[9'h042],
             make_lut[9'h01C],
             make_lut[9'h01B]
+            // make_lut[9'h069], //-> PERSONAL
+            // make_lut[9'h072],
+            // make_lut[9'h03B],
+            // make_lut[9'h042],
+            // make_lut[9'h01C],
+            // make_lut[9'h01B]
         },
 
         {
-            make_lut[9'h07A],
-            make_lut[9'h04B],
+            make_lut[9'h07A], // -> ECF
+            make_lut[9'h042],
             make_lut[9'h023]
+            // make_lut[9'h07A],
+            // make_lut[9'h04B],
+            // make_lut[9'h023]
         },
 
         colour,
@@ -510,31 +513,13 @@ module ram_port_a_controls(
         if(run_game) begin
 
             case(logic_state)
-                C_P0W: begin
+                C_P0W, C_P0W2, C_P0: begin
                     address_a = p_pos_x[0] + p_pos_y[0] * WIDTH;
                 end
-                C_P0W2: begin
-                    address_a = p_pos_x[0] + p_pos_y[0] * WIDTH;
-                end
-                C_P0: begin
-                    address_a = p_pos_x[0] + p_pos_y[0] * WIDTH;
-                end
-                C_P1W: begin
+                C_P1W, C_P1W2, C_P1: begin
                     address_a = p_pos_x[1] + p_pos_y[1] * WIDTH;
                 end
-                C_P1W2: begin
-                    address_a = p_pos_x[1] + p_pos_y[1] * WIDTH;
-                end
-                C_P1: begin
-                    address_a = p_pos_x[1] + p_pos_y[1] * WIDTH;
-                end
-                C_P2W: begin
-                    address_a = p_pos_x[2] + p_pos_y[2] * WIDTH;
-                end
-                C_P2W2: begin
-                    address_a = p_pos_x[2] + p_pos_y[2] * WIDTH;
-                end
-                C_P2: begin
+                C_P2W, C_P2W2, C_P2: begin
                     address_a = p_pos_x[2] + p_pos_y[2] * WIDTH;
                 end
                 W_P0: begin
@@ -786,8 +771,8 @@ module ram_port_b_controls(
     always @(*)
     begin: d_control
         data_b <= PE;
-        x_off <= draw_state == D_DRAW2 || draw_state == D_DRAW4;
-        y_off <= draw_state == D_DRAW3 || draw_state == D_DRAW4;
+        x_off <= draw_state == D_DRAW2 || draw_state == D_DRAW1;
+        y_off <= draw_state == D_DRAW3 || draw_state == D_DRAW1;
 
 
         case(draw_state)
@@ -801,9 +786,8 @@ module ram_port_b_controls(
                 y = {d_y, y_off};
 
                 plot <= 1'b1;
-                if(q_b != PE && !p_state[q_b]) begin
-                    wren_b = 1'b1;
-                end else wren_b = 1'b0;
+				
+                wren_b <= q_b != PE && !p_state[q_b];
             end
             D_INC: begin
             end
