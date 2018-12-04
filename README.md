@@ -43,7 +43,7 @@ We will use this week to polish up the game, adding additional quality-of-life i
 * ~~Implement ability to select colours without recompiling~~
 * Let the players choose how many players will play (during runtime)
 * ~~Implement a pause? (unsure about this one, will do if we have time. Worst comes to worst, just halt the ```game clock``` when pause is clicked.)~~
-* Fading the screen between transitions (although we only have ```2-bit``` colour channels, not sure how this would look in the end)
+* ~~Fading the screen between transitions (although we only have ```2-bit``` colour channels, not sure how this would look in the end)~~
 
 After this week, the game will be done!
 
